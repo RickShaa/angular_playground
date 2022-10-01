@@ -1,0 +1,50 @@
+<!--
+  Gives the user of the component more flexibility 
+  HTML can be arranged as needed. but state is passed automatically
+
+  Caution: since I am not using onChange lifecycle hook, set needs to be set by toggleComponent 
+  for all content-components
+-->
+
+<!--
+  If we want to have multiple contentChildren, and not know how many or which exactly -> Dependency Injection
+  Inject parent ->toggle in to child and use toggle.on as state. @Inputs can be removed
+
+  <app-toggle (toggleChange)="onToggleChange($event)">
+  <app-toggle-on>{{ "I am On" }}</app-toggle-on>
+  <app-toggle-on>{{ "I am On" }}</app-toggle-on>
+  <app-toggle-on>{{ "I am On" }}</app-toggle-on>
+  <app-toggle-on>{{ "I am On" }}</app-toggle-on>
+  <app-toggle-on>{{ "I am On" }}</app-toggle-on>
+  <app-toggle-button></app-toggle-button>
+  <app-toggle-off>{{ "I am Off" }}</app-toggle-off>
+  <app-toggle-off>{{ "I am Off" }}</app-toggle-off>
+  <app-toggle-off>{{ "I am Off" }}</app-toggle-off>
+</app-toggle>
+-->
+
+<!--
+  Since toggle does not have actuall HTML in it. We can refactor the toggleComponent to a directive
+-->
+
+<div toggle #firstToggle="toggle" (toggleChange)="onToggleChange($event)">
+  <toggle-on>{{ "I am On" }}</toggle-on>
+  <toggle-on>{{ "I am On" }}</toggle-on>
+  <toggle-button></toggle-button>
+  <toggle-off>{{ "I am Off" }}</toggle-off>
+  <toggle-off>{{ "I am Off" }}</toggle-off>
+  <toggle-off>{{ "I am Off" }}</toggle-off>
+</div>
+
+<!--Share Toggle State of firstToggle-->
+
+<h1>Hello</h1>
+
+<div [toggleProvider]="firstToggle">
+  <toggle-on>{{ "I am On" }}</toggle-on>
+  <toggle-on>{{ "I am On" }}</toggle-on>
+  <toggle-button></toggle-button>
+  <toggle-off>{{ "I am Off" }}</toggle-off>
+  <toggle-off>{{ "I am Off" }}</toggle-off>
+  <toggle-off>{{ "I am Off" }}</toggle-off>
+</div>
