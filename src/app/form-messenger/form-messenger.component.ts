@@ -68,12 +68,12 @@ export class FormMessengerComponent implements OnInit, OnDestroy {
       this.senderSubs.push(
         control.valueChanges
           .pipe(
-            debounceTime(500),
+            debounceTime(800),
             switchMap((val) => {
               return from(this.receiverControls).pipe(
-                filter((control) => control.id === idAsString),
-                tap((control) => {
-                  control.control.patchValue(val);
+                filter((receiver) => receiver.id === idAsString),
+                tap((receiver) => {
+                  receiver.control.patchValue(val);
                 })
               );
             })
