@@ -1,0 +1,13 @@
+<section class="center">
+  <form [formGroup]="formGroup">
+    <ng-container *ngFor="let field of fields">
+      <input type="text" [formControlName]="field.id.toString()" />
+    </ng-container>
+  </form>
+
+  <form [formGroup]="readOnlyGroup">
+    <ng-container *ngFor="let field of readOnlyField">
+      <input type="text" [formControlName]="field.id.toString()" />
+    </ng-container>
+  </form>
+</section>
