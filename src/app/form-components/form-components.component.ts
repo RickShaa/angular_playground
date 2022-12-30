@@ -1,6 +1,11 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
-import {ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR, UntypedFormBuilder} from "@angular/forms";
-import {BehaviorSubject, Observable, of, Subscription} from "rxjs";
+import {Component, Input, OnDestroy, OnInit} from '@angular/core';
+import {
+  ControlValueAccessor,
+  FormControl,
+  NG_VALUE_ACCESSOR,
+  UntypedFormBuilder,
+} from "@angular/forms";
+import {BehaviorSubject, Subscription} from "rxjs";
 
 type TOption = {
   id: number,
@@ -19,6 +24,9 @@ type TOption = {
           </mat-option>
         </mat-autocomplete>
       </mat-form-field>
+      <ng-container *ngIf="control.touched">
+        <p>Its touched</p>
+      </ng-container>
     </form>
   `,
   styleUrls: ['./form-components.component.sass'],
@@ -28,8 +36,8 @@ type TOption = {
     multi:true
   }]
 })
-export class FormComponentsComponent implements ControlValueAccessor,OnDestroy {
-  control: FormControl<string> = this.fb.control('')
+export class FormComponentsComponent implements ControlValueAccessor,OnDestroy, OnInit {
+  @Input() control!: FormControl<string>
   options: TOption[] = [{
     id: 9,
     optionValue: "Value 9"
@@ -44,6 +52,10 @@ export class FormComponentsComponent implements ControlValueAccessor,OnDestroy {
   private valueChangesSub: Subscription | undefined = undefined
 
   constructor(private fb: UntypedFormBuilder) {
+
+  }
+
+  ngOnInit() {
   }
 
   ngOnDestroy() {
