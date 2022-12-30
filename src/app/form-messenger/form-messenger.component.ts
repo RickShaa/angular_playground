@@ -80,7 +80,6 @@ export class FormMessengerComponent implements OnInit, OnDestroy {
           )
           .subscribe()
       );
-
       this.formGroup.addControl(idAsString, control);
     });
     this.readOnlyField.forEach((field) => {

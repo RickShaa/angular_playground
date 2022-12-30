@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
+import {FormBuilder, FormControl, FormGroup, UntypedFormBuilder} from "@angular/forms";
 
 @Component({
   selector: 'app-root',
@@ -6,5 +7,10 @@ import { Component } from '@angular/core';
   styleUrls: ['./app.component.sass']
 })
 export class AppComponent {
-  title = 'playground';
+  formGroup:FormGroup = this.fb.group({
+    control: new FormControl('')
+  })
+  constructor(private fb:UntypedFormBuilder) {
+    this.formGroup.valueChanges.subscribe(console.log)
+  }
 }
