@@ -1,12 +1,19 @@
-import {Component, Input, OnDestroy, OnInit} from '@angular/core';
+import {Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges} from '@angular/core';
 import {
-  ControlValueAccessor,
   FormControl,
-  NG_VALUE_ACCESSOR,
   UntypedFormBuilder,
 } from "@angular/forms";
 import {BehaviorSubject, Subscription} from "rxjs";
 
+const OPTIONS: TOption[] = [{
+  id: 9,
+  optionValue: "Value 9"
+}, {
+  id: 1,
+  optionValue: "Test 3"
+}
+]
+type MarkTouched = (opts?: { onlySelf?: boolean | undefined; } | undefined) => void
 type TOption = {
   id: number,
   optionValue:string
@@ -17,38 +24,30 @@ type TOption = {
     <form [style]="{width:'100%'}">
       <mat-form-field appearance="fill">
         <mat-label>Assignments</mat-label>
-        <input (blur)="onTouched()"  type="text" matInput [formControl]="control" [matAutocomplete]="auto">
-        <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn.bind(this)" (optionSelected)="onSelected()">
-          <mat-option *ngFor="let option of filteredOptions$ | async" [value]="stringify(option.id)">
+        <input (blur)="viewControl.markAsTouched()"  type="text" matInput
+               [formControl]="viewControl" [matAutocomplete]="auto">
+
+        <mat-autocomplete #auto="matAutocomplete"
+                          [displayWith]="displayFn.bind(this)"
+                          (optionSelected)="onSelected()">
+          <mat-option *ngFor="let option of filteredOptions$ | async"
+                      [value]="stringify(option.id)">
             {{option.optionValue}}
           </mat-option>
         </mat-autocomplete>
       </mat-form-field>
-      <ng-container *ngIf="control.touched">
-        <p>Its touched</p>
+      <ng-container *ngIf="viewControl.touched">
+        toucheed
       </ng-container>
     </form>
   `,
   styleUrls: ['./form-components.component.sass'],
-  providers: [{
-    provide:NG_VALUE_ACCESSOR,
-    useExisting:FormComponentsComponent,
-    multi:true
-  }]
+
 })
-export class FormComponentsComponent implements ControlValueAccessor,OnDestroy, OnInit {
+export class FormComponentsComponent implements OnDestroy, OnInit {
   @Input() control!: FormControl<string>
-  options: TOption[] = [{
-    id: 9,
-    optionValue: "Value 9"
-  }, {
-    id: 3,
-    optionValue: "Test 3"
-  }
-  ]
-  onChange = (val:any)=> {}
-  onTouched = () => {}
-  filteredOptions$:BehaviorSubject<TOption[]> = new BehaviorSubject<TOption[]>(this.options)
+  viewControl!:FormControl<string>;
+  filteredOptions$:BehaviorSubject<TOption[]> = new BehaviorSubject<TOption[]>(OPTIONS)
   private valueChangesSub: Subscription | undefined = undefined
 
   constructor(private fb: UntypedFormBuilder) {
@@ -56,6 +55,13 @@ export class FormComponentsComponent implements ControlValueAccessor,OnDestroy, 
   }
 
   ngOnInit() {
+    //receives original control config
+    this.viewControl = this.fb.nonNullable.control(this.control.value, this.control.validator)
+    //resets touched listener
+    this.control.markAsTouched = () =>{
+      this.viewControl.markAsTouched()
+    }
+    this.setupValueChange()
   }
 
   ngOnDestroy() {
@@ -64,14 +70,21 @@ export class FormComponentsComponent implements ControlValueAccessor,OnDestroy, 
     }
   }
 
+  /*
+    Patches the original control value on select
+   */
   onSelected(){
-    this.onChange(this.control.value)
+    this.control.setValue(this.viewControl.value)
   }
+
+  /*
+    Used exclusively for serializing an id to a displayName
+   */
 
   displayFn(value:string){
     if(!this.isValidJson(value)) return ''
     const id = (this.parseId(value) as Array<number>)[0]
-    const option = this.options.find(option => option.id === id)
+    const option = OPTIONS.find(option => option.id === id)
     return option ? option.optionValue : ''
   }
 
@@ -92,25 +105,13 @@ export class FormComponentsComponent implements ControlValueAccessor,OnDestroy, 
     return JSON.parse(value)
   }
 
-  registerOnChange(fn: any): void {
-    this.onChange = fn
-  }
-
-  registerOnTouched(fn: any): void {
-    this.onTouched = fn;
-  }
-
-  writeValue(value: any): void {
-    if(value){
-      this.control.setValue(value)
-    }
-    this.setupValueChange()
-  }
-
+  /*
+    Used for filtering logic and other view related events
+   */
   setupValueChange(){
     if(this.valueChangesSub instanceof Subscription) return;
-    this.valueChangesSub = this.control.valueChanges.subscribe(value => {
-      const options = this.options.filter(option => option.optionValue.includes(value))
+    this.valueChangesSub = this.viewControl.valueChanges.subscribe(value => {
+      const options = OPTIONS.filter(option => option.optionValue.includes(value))
       this.filteredOptions$.next(options)
     })
   }
