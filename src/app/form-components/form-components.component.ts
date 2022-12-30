@@ -24,7 +24,7 @@ type TOption = {
     <form [style]="{width:'100%'}">
       <mat-form-field appearance="fill">
         <mat-label>Assignments</mat-label>
-        <input (blur)="viewControl.markAsTouched()"  type="text" matInput
+        <input (blur)="onTouched()"  type="text" matInput
                [formControl]="viewControl" [matAutocomplete]="auto">
 
         <mat-autocomplete #auto="matAutocomplete"
@@ -55,7 +55,7 @@ export class FormComponentsComponent implements OnDestroy, OnInit {
   }
 
   ngOnInit() {
-    //receives original control config
+    //sync original with view control
     this.viewControl = this.fb.nonNullable.control(this.control.value, this.control.validator)
     //resets touched listener
     this.control.markAsTouched = () =>{
@@ -68,6 +68,14 @@ export class FormComponentsComponent implements OnDestroy, OnInit {
     if(this.valueChangesSub instanceof  Subscription){
       this.valueChangesSub.unsubscribe()
     }
+  }
+  /*
+    If user did not set a value on select it is reset to previous value
+   */
+
+  onTouched(){
+    this.viewControl.markAsTouched();
+    console.log(this.control.value);
   }
 
   /*

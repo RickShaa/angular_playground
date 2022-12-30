@@ -5,7 +5,7 @@ type FieldType = "number" | "dropdown" | "people-picker"
 const fields:
   {id:number,readonly:boolean,required:boolean,value:string | null, type:FieldType} []
   = [{id:1,readonly:true,required:false,value:null, type:"number"},
-  {id:2,readonly:false,required:true,value:null, type:"dropdown"},
+  {id:2,readonly:false,required:true,value:'[1]', type:"dropdown"},
   {id:3,readonly:false,required:true,value:null, type:"people-picker"}
 ]
 @Component({
